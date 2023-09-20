@@ -1,5 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:project/QuizScreen.dart';
+import 'package:project/RegisterScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,6 +14,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false, // Set this to false
+
       theme: ThemeData(
         primarySwatch: Colors.purple, // Changed to purple
         visualDensity: VisualDensity.adaptivePlatformDensity,
@@ -42,8 +46,9 @@ class _LoginState extends State<Login> {
                 height: deviceHeight * 0.30,
                 child: FittedBox(
                   child: CircleAvatar(
-                    backgroundImage: AssetImage('assets/image/apple.jpg'),
-                    radius: 120,
+                    backgroundImage: NetworkImage(
+                        'https://cdnl.iconscout.com/lottie/premium/preview/online-exam-4099435-3420726.png?f=webp'),
+                    radius: 12,
                   ),
                 ),
                 color: Colors.purple[700], // Adjusted to deeper purple
@@ -57,7 +62,7 @@ class _LoginState extends State<Login> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Login Now",
+                        "QUIZ GAME",
                         style: TextStyle(
                             fontSize: 28, // Reduced font size to 28
                             fontWeight: FontWeight.bold,
@@ -66,8 +71,7 @@ class _LoginState extends State<Login> {
                       SizedBox(
                         height: constraints.maxHeight * 0.01,
                       ),
-                      Text("Enter the Details",
-                          style: TextStyle(color: Colors.purple[400])),
+                      Text("", style: TextStyle(color: Colors.purple[400])),
                       SizedBox(
                         height: constraints.maxHeight * 0.08,
                       ),
@@ -83,7 +87,7 @@ class _LoginState extends State<Login> {
                             child: TextField(
                               decoration: InputDecoration(
                                 border: InputBorder.none,
-                                hintText: "Gmail",
+                                hintText: "Email",
                               ),
                             ),
                           ),
@@ -145,7 +149,15 @@ class _LoginState extends State<Login> {
                           top: constraints.maxHeight * 0.05,
                         ),
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Optional: Add validation logic for email and password here.
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => QuizScreen(),
+                              ),
+                            );
+                          },
                           child: Text(
                             'Login',
                             style: TextStyle(
@@ -195,16 +207,6 @@ class _LoginState extends State<Login> {
           ),
         ),
       ),
-    );
-  }
-}
-
-class RegisterScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Register')),
-      body: Center(child: Text('Registration Page')),
     );
   }
 }
