@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/QuestionScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -58,7 +59,7 @@ class _QuizScreenState extends State<QuizScreen>
               return [
                 PopupMenuItem(
                   child: Text('Log Out'),
-                  value: 'Quiz1',
+                  value: 'Logout',
                 )
               ];
             },
@@ -74,47 +75,76 @@ class _QuizScreenState extends State<QuizScreen>
       ),
       body: Stack(
         children: [
-          // Background Image
+          // Background Image with Gradient Overlay
           Positioned.fill(
-            child: ColorFiltered(
-              colorFilter: ColorFilter.mode(
-                  Colors.white.withOpacity(0.3), BlendMode.lighten),
-              child: Image.network(
-                'https://static.vecteezy.com/system/resources/thumbnails/001/991/202/small/realistic-isolated-neon-sign-of-question-template-decoration-and-covering-on-the-wall-background-vector.jpg',
-                fit: BoxFit.cover,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.purple.withOpacity(0.6),
+                    Colors.purple.withOpacity(0.3),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+              child: ColorFiltered(
+                colorFilter: ColorFilter.mode(
+                    Colors.white.withOpacity(0.3), BlendMode.lighten),
+                child: Image.network(
+                  'https://media.istockphoto.com/id/937025360/photo/abstract-soft-purple-background.webp?b=1&s=170667a&w=0&k=20&c=6tuPIWg9E-0q7th-TDn72BrK5DoFCaP2pE3A-drhS1A=',
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
           // Content: TabBarView
-          TabBarView(
-            controller: _tabController,
-            children: [
-              ListView.builder(
-                itemCount: 3,
-                itemBuilder: (ctx, index) {
-                  return ListTile(
-                    leading: Icon(Icons.quiz),
-                    title: Text('Quiz ${index + 1}'),
-                    subtitle: Text("This is a basic quiz"),
-                    trailing: Text("9:00 AM"),
-                  );
-                },
-              ),
-              ListView.builder(
-                itemCount: 3,
-                itemBuilder: (ctx, index) {
-                  return ListTile(
-                    leading: Icon(Icons.quiz),
-                    title: Text('Medium Quiz ${index + 1}'),
-                    subtitle: Text("This is a medium difficulty quiz"),
-                    trailing: Text("10:00 AM"),
-                  );
-                },
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _quizListView(),
+                _quizListView(),
+              ],
+            ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _quizListView() {
+    return ListView.builder(
+      itemCount: 3,
+      itemBuilder: (ctx, index) {
+        return Card(
+          elevation: 5,
+          margin: EdgeInsets.symmetric(vertical: 10.0),
+          child: ListTile(
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            leading: CircleAvatar(
+              backgroundColor: Colors.purple,
+              child: Icon(Icons.quiz, color: Colors.white),
+            ),
+            title: Text('Quiz ${index + 1}',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text("Test your knowledge!"),
+            trailing: Chip(
+              backgroundColor: Colors.amber,
+              label: Text(
+                "9:00 AM",
+                style: TextStyle(color: Colors.purple),
+              ),
+            ),
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (_) => QuestionScreen()));
+            },
+          ),
+        );
+      },
     );
   }
 }
