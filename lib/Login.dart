@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:project/QuizScreen.dart';
 import 'package:project/RegisterScreen.dart';
+import 'package:project/ForgotPasswordScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false, // Set this to false
 
       theme: ThemeData(
-        primarySwatch: Colors.purple, // Changed to purple
+        primarySwatch: Colors.purple,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Login(),
@@ -132,12 +133,17 @@ class _LoginState extends State<Login> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          ForgotPasswordScreen()),
+                                );
+                              },
                               child: Text(
                                 " Forgot Password",
                                 style: TextStyle(
-                                  color: Colors
-                                      .purple[300], // Adjusted to light purple
+                                  color: Colors.purple[300],
                                 ),
                               ))
                         ],
@@ -150,13 +156,11 @@ class _LoginState extends State<Login> {
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            // Optional: Add validation logic for email and password here.
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => QuizScreen(),
-                              ),
-                            );
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        QuizScreen(userName: '20SW122')));
                           },
                           child: Text(
                             'Login',
@@ -164,8 +168,7 @@ class _LoginState extends State<Login> {
                                 fontWeight: FontWeight.bold, fontSize: 22),
                           ),
                           style: ElevatedButton.styleFrom(
-                              primary:
-                                  Colors.purple[600], // Adjusted to deep purple
+                              primary: Colors.purple[600],
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(28),
                               )),
@@ -185,8 +188,7 @@ class _LoginState extends State<Login> {
                             TextSpan(
                                 text: "Register",
                                 style: TextStyle(
-                                  color:
-                                      Colors.purple[500], // Adjusted to purple
+                                  color: Colors.purple[500],
                                   fontSize: 18,
                                 ),
                                 recognizer: TapGestureRecognizer()
