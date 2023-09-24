@@ -16,12 +16,42 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.purple,
       ),
-      home: QuizScreen(),
+      home: Login(),
+    );
+  }
+}
+
+class Login extends StatefulWidget {
+  @override
+  _LoginState createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
+  String userName = "20SW122"; // Changed username to 20SW122
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => QuizScreen(userName: userName)));
+          },
+          child: Text("Login"),
+        ),
+      ),
     );
   }
 }
 
 class QuizScreen extends StatefulWidget {
+  final String userName;
+
+  QuizScreen({required this.userName});
+
   @override
   _QuizScreenState createState() => _QuizScreenState();
 }
@@ -46,7 +76,18 @@ class _QuizScreenState extends State<QuizScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quiz Test'),
+        title: Row(
+          children: [
+            Text('Welcome, '),
+            Text(
+              widget.userName,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.amber,
+              ),
+            ),
+          ],
+        ),
         backgroundColor: Colors.purple,
         actions: [
           IconButton(
