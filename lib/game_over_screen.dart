@@ -1,36 +1,12 @@
 import 'package:flutter/material.dart';
-
-import 'package:project/Login.dart'; // Ensure the path is correct
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false, // Set this to false
-
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-      ),
-      home: Login(),
-    );
-  }
-}
+import 'package:Quiz/QuizScreen.dart';
 
 class GameOverScreen extends StatelessWidget {
   final int score;
   final int totalQuestions;
-
+  final String name;
   GameOverScreen(
-      {required this.score,
-      required this.totalQuestions,
-      required String name});
+      {required this.score, required this.totalQuestions, required this.name});
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +46,7 @@ class GameOverScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 20),
                   Text(
-                    "Name: Aisha",
+                    " $name",
                     style: TextStyle(fontSize: 20),
                   ),
                   Text(
@@ -93,7 +69,13 @@ class GameOverScreen extends StatelessWidget {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pushReplacementNamed('/');
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => QuizScreen(
+                            userName: name,
+                          ),
+                        ),
+                      );
                     },
                     child: Text(
                       "Play Again",

@@ -1,51 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:project/QuestionScreen.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-      ),
-      home: Login(),
-    );
-  }
-}
-
-class Login extends StatefulWidget {
-  @override
-  _LoginState createState() => _LoginState();
-}
-
-class _LoginState extends State<Login> {
-  String userName = "20SW122"; // Changed username to 20SW122
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => QuizScreen(userName: userName)));
-          },
-          child: Text("Login"),
-        ),
-      ),
-    );
-  }
-}
+import 'package:Quiz/Login.dart';
+import 'package:Quiz/QuestionScreen.dart';
 
 class QuizScreen extends StatefulWidget {
   final String userName;
@@ -62,7 +19,9 @@ class _QuizScreenState extends State<QuizScreen>
 
   @override
   void initState() {
+    WidgetsFlutterBinding.ensureInitialized();
     super.initState();
+    _data();
     _tabController = TabController(length: 2, vsync: this);
   }
 
@@ -72,16 +31,54 @@ class _QuizScreenState extends State<QuizScreen>
     super.dispose();
   }
 
+  var data;
+  var data2;
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  void _data() async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    DocumentReference quizDocument = firestore.doc('/quizes/my');
+    DocumentSnapshot snapshot = await quizDocument.get();
+    setState(() {
+      if (snapshot.exists) {
+        data =
+            (snapshot.data() as Map<String, dynamic>)['quizes'][0]['quizzes'];
+        data2 =
+            (snapshot.data() as Map<String, dynamic>)['quizes'][1]['quizzes'];
+      } else {
+        data = 'No Data';
+      }
+    });
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await _auth.signOut();
+      // User is signed out.
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const Login(),
+        ),
+      ); // Close the logout screen or navigate to another screen.
+    } catch (e) {
+      print("Error during logout: $e");
+      // Handle error, if any.
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Row(
           children: [
-            Text('Welcome, '),
+            const Text(
+              'Welcome, ',
+              style: TextStyle(color: Colors.white),
+            ),
             Text(
               widget.userName,
-              style: TextStyle(
+              style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Colors.amber,
               ),
@@ -90,25 +87,27 @@ class _QuizScreenState extends State<QuizScreen>
         ),
         backgroundColor: Colors.purple,
         actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () {},
-          ),
           PopupMenuButton(
+            color: Colors.white,
             onSelected: (value) {},
             itemBuilder: (BuildContext context) {
               return [
                 PopupMenuItem(
-                  child: Text('Log Out'),
+                  child:
+                      Text('Log Out', style: TextStyle(color: Colors.purple)),
                   value: 'Logout',
+                  onTap: () {
+                    _signOut();
+                  },
                 )
               ];
             },
           ),
         ],
         bottom: TabBar(
+          labelColor: Colors.white,
           controller: _tabController,
-          tabs: [
+          tabs: const [
             Tab(text: 'Level 1'),
             Tab(text: 'Level 2'),
           ],
@@ -145,8 +144,8 @@ class _QuizScreenState extends State<QuizScreen>
             child: TabBarView(
               controller: _tabController,
               children: [
-                _quizListView(),
-                _quizListView(),
+                _quizListView1(),
+                _quizListView2(),
               ],
             ),
           ),
@@ -155,9 +154,13 @@ class _QuizScreenState extends State<QuizScreen>
     );
   }
 
-  Widget _quizListView() {
+  var a;
+  Widget _quizListView1() {
+    if (data == null) {
+      return Center(child: CircularProgressIndicator());
+    }
     return ListView.builder(
-      itemCount: 3,
+      itemCount: data.length,
       itemBuilder: (ctx, index) {
         return Card(
           elevation: 5,
@@ -169,19 +172,94 @@ class _QuizScreenState extends State<QuizScreen>
               backgroundColor: Colors.purple,
               child: Icon(Icons.quiz, color: Colors.white),
             ),
-            title: Text('Quiz ${index + 1}',
+            title: Text('${data[index]['name']}',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text("Test your knowledge!"),
             trailing: Chip(
               backgroundColor: Colors.amber,
               label: Text(
-                "9:00 AM",
+                "5 minutes",
                 style: TextStyle(color: Colors.purple),
               ),
             ),
             onTap: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (_) => QuestionScreen()));
+              if (data[index]['name'] == 'English') {
+                setState(() {
+                  a = 0;
+                });
+              } else if (data[index]['name'] == 'Maths') {
+                setState(() {
+                  a = 2;
+                });
+              } else if (data[index]['name'] == 'Science') {
+                setState(() {
+                  a = 1;
+                });
+              }
+              setState(() {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (_) => QuestionScreen(
+                          player: widget.userName,
+                          num: 0,
+                          name: a,
+                        )));
+              });
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _quizListView2() {
+    if (data2 == null) {
+      return Center(child: CircularProgressIndicator());
+    }
+    return ListView.builder(
+      itemCount: data2.length,
+      itemBuilder: (ctx, index) {
+        return Card(
+          elevation: 5,
+          margin: EdgeInsets.symmetric(vertical: 10.0),
+          child: ListTile(
+            contentPadding:
+                EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            leading: CircleAvatar(
+              backgroundColor: Colors.purple,
+              child: Icon(Icons.quiz, color: Colors.white),
+            ),
+            title: Text('${data2[index]['name']}',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text("Test your knowledge!"),
+            trailing: Chip(
+              backgroundColor: Colors.amber,
+              label: Text(
+                "5 minutes",
+                style: TextStyle(color: Colors.purple),
+              ),
+            ),
+            onTap: () {
+              if (data2[index]['name'] == 'Flutter') {
+                setState(() {
+                  a = 0;
+                });
+              } else if (data2[index]['name'] == 'Programming') {
+                setState(() {
+                  a = 1;
+                });
+              } else if (data2[index]['name'] == 'Technology') {
+                setState(() {
+                  a = 2;
+                });
+              }
+              setState(() {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (_) => QuestionScreen(
+                          player: widget.userName,
+                          num: 1,
+                          name: a,
+                        )));
+              });
             },
           ),
         );

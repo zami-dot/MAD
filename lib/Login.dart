@@ -1,38 +1,71 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:project/QuizScreen.dart';
-import 'package:project/RegisterScreen.dart';
-import 'package:project/ForgotPasswordScreen.dart';
-
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false, // Set this to false
-
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: Login(),
-    );
-  }
-}
+import 'package:firebase_auth/firebase_auth.dart';
+import 'forgot.dart';
+import 'RegisterScreen.dart';
+import 'QuizScreen.dart';
 
 class Login extends StatefulWidget {
+  const Login({super.key});
+
   @override
   _LoginState createState() => _LoginState();
 }
 
 class _LoginState extends State<Login> {
   var _isvisible = false;
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String name = '';
+  String _error = '';
+  bool _isLoading = false;
+  Future<void> _login() async {
+    try {
+      final String email = _emailController.text.trim();
+      final String password = _passwordController.text.trim();
+      setState(() {
+        _isLoading = true;
+        _error = ''; // Show loading indicator
+      });
+
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      User user = FirebaseAuth.instance.currentUser!;
+      var var1 = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (userCredential.user!.emailVerified) {
+        if (userCredential.user != null) {
+          // Navigate to the home screen on successful login
+          setState(() {
+            name = var1.data()?['fullName'];
+            _isLoading = false; // Hide loading indicator
+          });
+
+          Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => QuizScreen(
+              userName: name,
+            ),
+          ));
+        }
+      } else {
+        setState(() {
+          _error = 'Please verify your email address';
+          _isLoading = false; // Hide loading indicator
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _isLoading = false;
+        _error = e.message ?? 'An error occurred';
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,12 +80,10 @@ class _LoginState extends State<Login> {
                 height: deviceHeight * 0.30,
                 child: FittedBox(
                   child: CircleAvatar(
-                    backgroundImage: NetworkImage(
+                    backgroundImage: const NetworkImage(
                         'https://cdnl.iconscout.com/lottie/premium/preview/online-exam-4099435-3420726.png?f=webp'),
-                    radius: 12,
                   ),
                 ),
-                color: Colors.purple[700], // Adjusted to deeper purple
               ),
               Container(
                 height: deviceHeight * 0.65,
@@ -63,7 +94,7 @@ class _LoginState extends State<Login> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "QUIZ GAME",
+                        "Login Now",
                         style: TextStyle(
                             fontSize: 28, // Reduced font size to 28
                             fontWeight: FontWeight.bold,
@@ -72,7 +103,8 @@ class _LoginState extends State<Login> {
                       SizedBox(
                         height: constraints.maxHeight * 0.01,
                       ),
-                      Text("", style: TextStyle(color: Colors.purple[400])),
+                      Text("Enter the Details",
+                          style: TextStyle(color: Colors.purple[400])),
                       SizedBox(
                         height: constraints.maxHeight * 0.08,
                       ),
@@ -86,6 +118,7 @@ class _LoginState extends State<Login> {
                           padding: const EdgeInsets.all(8.0),
                           child: Center(
                             child: TextField(
+                              controller: _emailController,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
                                 hintText: "Email",
@@ -107,6 +140,7 @@ class _LoginState extends State<Login> {
                           padding: const EdgeInsets.only(left: 15),
                           child: Center(
                             child: TextField(
+                              controller: _passwordController,
                               obscureText: _isvisible ? false : true,
                               decoration: InputDecoration(
                                 suffixIcon: IconButton(
@@ -134,19 +168,28 @@ class _LoginState extends State<Login> {
                         children: [
                           TextButton(
                               onPressed: () {
-                                Navigator.of(context).push(
+                                Navigator.push(
+                                  context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          ForgotPasswordScreen()),
+                                    builder: (context) =>
+                                        ForgotPasswordScreen(),
+                                  ),
                                 );
                               },
                               child: Text(
                                 " Forgot Password",
                                 style: TextStyle(
-                                  color: Colors.purple[300],
+                                  color: Colors
+                                      .purple[300], // Adjusted to light purple
                                 ),
-                              ))
+                              )),
                         ],
+                      ),
+                      if (_isLoading) // Show loading indicator
+                        CircularProgressIndicator(),
+                      Text(
+                        _error,
+                        style: TextStyle(color: Colors.red),
                       ),
                       Container(
                         width: double.infinity,
@@ -156,19 +199,18 @@ class _LoginState extends State<Login> {
                         ),
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        QuizScreen(userName: '20SW122')));
+                            _isLoading ? null : _login();
                           },
                           child: Text(
                             'Login',
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 22),
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 22),
                           ),
                           style: ElevatedButton.styleFrom(
-                              primary: Colors.purple[600],
+                              primary:
+                                  Colors.purple[600], // Adjusted to deep purple
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(28),
                               )),
@@ -188,12 +230,13 @@ class _LoginState extends State<Login> {
                             TextSpan(
                                 text: "Register",
                                 style: TextStyle(
-                                  color: Colors.purple[500],
+                                  color:
+                                      Colors.purple[500], // Adjusted to purple
                                   fontSize: 18,
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    Navigator.push(
+                                    Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => RegisterScreen(),
