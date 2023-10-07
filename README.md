@@ -22,7 +22,8 @@ Once the user completes the quiz, their answers are submitted and compared with 
 <br>Another was after login or signup we have to wait due to verification there user still can use application which may cause error so we have used circular progress indicator
 <br>Another was data took some time to be fetched so it show red null exception for some seconds so there again we use circular progress indicator.
 
-<br>**Responsive Screens**
+<br>**Responsive Screens**<br/>
+
 ![WhatsApp Image 2023-10-06 at 23 20 35_14a351e1](https://github.com/zami-dot/MAD/assets/80031450/43170cca-149e-4618-b8d5-bb81270ecd16)
 
 ![WhatsApp Image 2023-10-06 at 23 20 35_59d347a0](https://github.com/zami-dot/MAD/assets/80031450/dfb5e10c-4842-41d1-9738-ace9220c3efe)
