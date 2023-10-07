@@ -13,7 +13,16 @@ Each quiz comprises multiple flashcards, with each flashcard showing a question 
 Then lastly,
 Result & Analysis:
 Once the user completes the quiz, their answers are submitted and compared with the correct answers stored in the database. The user is then presented with their score.
-**Responsive Screens**
+<br>**Data Storage**
+<br>Firebase cloud Storage is used due to it is  online quiz
+<br>**Issues and Bugs Encountered and Resolved during Development**
+<br>Severe bugs were encounterd during Development some are,
+<br>First bug was encountring that data were not be fatched from DataBase due to Rule there i choiced standard which make it false to write or read data so have to modify it.
+<br>Another bug was that after one login when we close application after again opening we have to login again it was tackled by using firebase active conncetion function to check if still conncection go directly to dashboard
+<br>Another was after login or signup we have to wait due to verification there user still can use application which may cause error so we have used circular progress indicator
+<br>Another was data took some time to be fetched so it show red null exception for some seconds so there again we use circular progress indicator.
+
+<br>**Responsive Screens**
 ![WhatsApp Image 2023-10-06 at 23 20 35_14a351e1](https://github.com/zami-dot/MAD/assets/80031450/43170cca-149e-4618-b8d5-bb81270ecd16)
 
 ![WhatsApp Image 2023-10-06 at 23 20 35_59d347a0](https://github.com/zami-dot/MAD/assets/80031450/dfb5e10c-4842-41d1-9738-ace9220c3efe)
@@ -26,11 +35,3 @@ Once the user completes the quiz, their answers are submitted and compared with 
 
 ![WhatsApp Image 2023-10-08 at 00 46 46_c638fbb0](https://github.com/zami-dot/MAD/assets/80031450/fa10c920-25b2-4f7d-ad99-3868fa8f0301)
 
-**Data Storage**
-Firebase cloud Storage is used due to it is  online quiz
-**Issues and Bugs Encountered and Resolved during Development**
-Severe bugs were encounterd during Development some are,
-First bug was encountring that data were not be fatched from DataBase due to Rule there i choiced standard which make it false to write or read data so have to modify it.
-Another bug was that after one login when we close application after again opening we have to login again it was tackled by using firebase active conncetion function to check if still conncection go directly to dashboard
-Another was after login or signup we have to wait due to verification there user still can use application which may cause error so we have used circular progress indicator
-Another was data took some time to be fetched so it show red null exception for some seconds so there again we use circular progress indicator.
